@@ -2,7 +2,7 @@
 
 namespace Ubirak\RestApiBehatExtension\Json;
 
-use mageekguy\atoum\asserter\generator as asserter;
+use atoum\atoum\asserter\generator as asserter;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\PyStringNode;
@@ -19,7 +19,11 @@ class JsonContext implements Context, SnippetAcceptingContext
     {
         $this->jsonInspector = $jsonInspector;
         $this->asserter = new asserter();
-        $this->jsonSchemaBaseUrl = rtrim($jsonSchemaBaseUrl, '/');
+
+        if (null !== $jsonSchemaBaseUrl) {
+            $jsonSchemaBaseUrl = rtrim($jsonSchemaBaseUrl, '/');
+        }
+        $this->jsonSchemaBaseUrl = $jsonSchemaBaseUrl;
     }
 
     /**
@@ -229,9 +233,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     {
         $json = $this->jsonInspector->searchJsonPath($pathExpression);
         if (is_array($json) && empty($json)) {
-          $this->asserter->variable($json)->isEqualTo([]);
+            $this->asserter->variable($json)->isEqualTo([]);
         } else {
-          $this->asserter->variable($json)->isNull();
+            $this->asserter->variable($json)->isNull();
         }
     }
 
