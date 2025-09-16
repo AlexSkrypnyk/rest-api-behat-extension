@@ -54,13 +54,13 @@ jobs:
         run: composer lint
         continue-on-error: ${{ vars.CI_LINT_IGNORE_FAILURE == '1' }}
 
-      - name: Run atoum tests
-        run: vendor/bin/atoum -ulr
+      - name: Run unit tests
+        run: composer test-unit
         continue-on-error: ${{ vars.CI_TEST_ATOUM_IGNORE_FAILURE == '1' }}
 
       - name: Start PHP web server
         run: php -S 127.0.0.1:8888 -t "${{ github.workspace }}/www" &
 
-      - name: Run Behat tests
-        run: vendor/bin/behat -f progress
+      - name: Run BDD tests
+        run: composer test-bdd
         continue-on-error: ${{ vars.CI_TEST_BEHAT_IGNORE_FAILURE == '1' }}

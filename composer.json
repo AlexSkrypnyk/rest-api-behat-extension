@@ -41,7 +41,6 @@
         "http-interop/http-factory-guzzle": "^1.1.1",
         "php-http/guzzle7-adapter": "^0.1.1",
         "php-http/mock-client": "^1.0",
-        "phpstan/phpstan": "^2",
         "rector/rector": "^2.1",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/process": "^7.0"
@@ -76,13 +75,13 @@
             "gherkinlint lint features"
         ],
         "lint-fix": [
-            "phpcbf",
-            "rector --clear-cache"
+            "rector --clear-cache",
+            "phpcbf"
         ],
         "reset": "rm -Rf vendor vendor-bin composer.lock",
         "start-server": "php -S 127.0.0.1:8888 -t \"$(pwd)/www\" &",
         "stop-server": "kill -9 $(lsof -t -i:8888)",
-        "test-atoum": "vendor/bin/atoum -ulr",
-        "test-behat": "vendor/bin/behat -f progress"
+        "test-bdd": "vendor/bin/behat -f progress",
+        "test-unit": "vendor/bin/atoum --use-light-report"
     }
 }
