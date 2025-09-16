@@ -8,6 +8,12 @@ use Ubirak\RestApiBehatExtension\Json\JsonParser as SUT;
 
 class JsonParser extends atoum
 {
+    private function getPropertyAccessor()
+    {
+        return \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+    }
     public function test_should_read_json()
     {
         $this
@@ -27,7 +33,7 @@ class JsonParser extends atoum
 
                 ->mock($json)
                     ->call('read')
-                    ->withArguments('foo.bar', new \Symfony\Component\PropertyAccess\PropertyAccessor(false, true))
+                    ->withArguments('foo.bar', $this->getPropertyAccessor())
                     ->once()
         ;
     }
@@ -68,7 +74,7 @@ class JsonParser extends atoum
 
                 ->mock($json)
                     ->call('read')
-                    ->withArguments('foo.bar', new \Symfony\Component\PropertyAccess\PropertyAccessor(false, true))
+                    ->withArguments('foo.bar', $this->getPropertyAccessor())
                     ->once()
         ;
     }
@@ -92,7 +98,7 @@ class JsonParser extends atoum
 
                 ->mock($json)
                     ->call('read')
-                    ->withArguments('foo->bar', new \Symfony\Component\PropertyAccess\PropertyAccessor(false, true))
+                    ->withArguments('foo->bar', $this->getPropertyAccessor())
                     ->once()
         ;
     }

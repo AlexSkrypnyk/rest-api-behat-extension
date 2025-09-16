@@ -54,7 +54,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         $this->workingDir = $dir;
         $this->phpBin = $php;
-        $this->process = new Process(null);
     }
 
     /**
@@ -72,14 +71,17 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function iRunBehat($arguments)
     {
         $argumentsString = strtr($arguments, array('\'' => '"'));
-        $this->process->setWorkingDirectory($this->workingDir);
-        $this->process->setCommandLine(sprintf(
+
+        $commandLine = sprintf(
             '%s %s %s %s',
             $this->phpBin,
             escapeshellarg(BEHAT_BIN_PATH),
             $argumentsString,
-            strtr('--no-colors', array('\'' => '"', '"' => '\"'))
-        ));
+            '--no-colors'
+        );
+
+        $this->process = Process::fromShellCommandline($commandLine);
+        $this->process->setWorkingDirectory($this->workingDir);
         $this->process->start();
         $this->process->wait();
     }

@@ -1,54 +1,62 @@
 {
     "name": "ubirak/rest-api-behat-extension",
-    "replace": {
-        "rezzza/json-api-behat-extension": "self.version",
-        "rezzza/rest-api-behat-extension": "self.version"
-    },
-    "type": "behat-extension",
     "description": "Rest Api Extension for Behat",
-    "keywords": ["api", "json", "rest", "test"],
     "license": "MIT",
-    "homepage": "https://github.com/ubirak/rest-api-behat-extension",
+    "type": "behat-extension",
+    "keywords": [
+        "api",
+        "json",
+        "rest",
+        "test"
+    ],
     "authors": [
         {
             "name": "Community contributors",
             "homepage": "https://github.com/ubirak/rest-api-behat-extension/contributors"
         }
     ],
-    "autoload": {
-        "psr-4": { "Ubirak\\RestApiBehatExtension\\": "src/" }
-    },
-    "minimum-stability": "dev",
+    "homepage": "https://github.com/ubirak/rest-api-behat-extension",
     "require": {
-        "php": ">=7.2",
-        "behat/behat": "^3.8",
-        "atoum/atoum": "^4",
-        "justinrainbow/json-schema": ">=5.2.10 <6.0",
-        "psr/http-message": "^1.0",
-        "php-http/discovery": "^1.13",
-        "php-http/client-common": "^2.3",
-        "php-http/message": "^1.11",
-        "tolerance/tolerance": "^0.4.2",
+        "php": ">=8.2",
+        "atoum/atoum": "^4.3",
+        "behat/behat": "^3.10",
+        "justinrainbow/json-schema": "^6",
         "mtdowling/jmespath.php": "^2.3",
-        "symfony/config": "^4.4.12 | ~5.0 | ~6.0 | ~7.0",
-        "symfony/dependency-injection": "^4.4.12 | ~5.0 | ~6.0 | ~7.0",
-        "symfony/property-access": "^4.4.12 | ~5.0 | ~6.0 | ~7.0"
+        "php-http/client-common": "^2.3",
+        "php-http/discovery": "^1.13",
+        "php-http/message": "^1.11",
+        "php-http/message-factory": "^1.1",
+        "psr/http-message": "^2.0",
+        "symfony/config": "^7.0",
+        "symfony/dependency-injection": "^7.0",
+        "symfony/http-foundation": "^7.0",
+        "symfony/property-access": "^7.0",
+        "tolerance/tolerance": "^0.4.2"
     },
     "require-dev": {
-        "silex/silex": "~2.0",
-        "symfony/process": "~4.0",
-        "guzzlehttp/psr7": "^1.3",
+        "ergebnis/composer-normalize": "^2.48",
+        "guzzlehttp/psr7": "^2.0",
+        "http-interop/http-factory-guzzle": "^1.1.1",
+        "php-http/guzzle7-adapter": "^0.1.1",
         "php-http/mock-client": "^1.0",
-        "php-http/guzzle7-adapter": "^0.1.1"
+        "symfony/process": "^7.0"
+    },
+    "replace": {
+        "rezzza/json-api-behat-extension": "self.version",
+        "rezzza/rest-api-behat-extension": "self.version"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Ubirak\\RestApiBehatExtension\\": "src/"
+        }
     },
     "config": {
-        "optimize-autoloader": true,
-        "preferred-install": {
-            "*": "dist"
-        },
         "allow-plugins": {
+            "ergebnis/composer-normalize": true,
             "php-http/discovery": true
-        }
+        },
+        "optimize-autoloader": true
     },
     "extra": {
         "branch-alias": {
