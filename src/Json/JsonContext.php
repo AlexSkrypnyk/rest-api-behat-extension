@@ -11,11 +11,11 @@ use Behat\Gherkin\Node\PyStringNode;
 
 class JsonContext implements Context, SnippetAcceptingContext
 {
-    private JsonInspector $jsonInspector;
+    protected JsonInspector $jsonInspector;
 
-    private asserter $asserter;
+    protected asserter $asserter;
 
-    private ?string $jsonSchemaBaseUrl = null;
+    protected ?string $jsonSchemaBaseUrl = null;
 
     public function __construct(JsonInspector $jsonInspector, $jsonSchemaBaseUrl = null)
     {
@@ -243,12 +243,12 @@ class JsonContext implements Context, SnippetAcceptingContext
         }
     }
 
-    private function evaluateJsonNodeValue($jsonNode)
+    protected function evaluateJsonNodeValue($jsonNode)
     {
         return $this->jsonInspector->readJsonNodeValue($jsonNode);
     }
 
-    private function evaluateExpectedValue($expectedValue)
+    protected function evaluateExpectedValue($expectedValue)
     {
         if (in_array($expectedValue, array('true', 'false'))) {
             return filter_var($expectedValue, FILTER_VALIDATE_BOOLEAN);
@@ -261,12 +261,12 @@ class JsonContext implements Context, SnippetAcceptingContext
         return $expectedValue;
     }
 
-    private function readJson(): Json
+    protected function readJson(): Json
     {
         return $this->jsonInspector->readJson();
     }
 
-    private function resolveFilename($filename)
+    protected function resolveFilename($filename)
     {
         if (is_file($filename)) {
             return realpath($filename);
@@ -291,7 +291,7 @@ class JsonContext implements Context, SnippetAcceptingContext
         return realpath($filename);
     }
 
-    private function assert(callable $assertion): void
+    protected function assert(callable $assertion): void
     {
         try {
             $assertion();
