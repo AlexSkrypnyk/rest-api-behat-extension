@@ -1,26 +1,30 @@
 <?php
 
 /**
- * Totally copied from https://github.com/Behat/WebApiExtension.
+ * Simple test server for Behat tests - replaced Silex with plain PHP routing.
  */
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new Silex\Application();
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-$app->match(
-    'echo',
-    function (Request $req) {
+$request = Request::createFromGlobals();
+$path = trim($request->getPathInfo(), '/');
+
+// Set JSON content type header
+header('Content-Type: application/json');
+
+switch ($path) {
+    case 'echo':
         $ret = array(
             'warning' => 'Do not expose this service in production : it is intrinsically unsafe',
         );
 
-        $ret['method'] = $req->getMethod();
+        $ret['method'] = $request->getMethod();
 
         // Forms should be read from request, other data straight from input.
-        $requestData = $req->request->all();
+        $requestData = $request->request->all();
         if (!empty($requestData)) {
             foreach ($requestData as $key => $value) {
                 $ret[$key] = $value;
@@ -28,7 +32,7 @@ $app->match(
         }
 
         /** @var string $content */
-        $content = $req->getContent(false);
+        $content = $request->getContent(false);
         if (!empty($content)) {
             $data = json_decode($content, true);
             if (!is_array($data)) {
@@ -41,53 +45,46 @@ $app->match(
         }
 
         $ret['headers'] = array();
-        foreach ($req->headers->all() as $k => $v) {
+        foreach ($request->headers->all() as $k => $v) {
             $ret['headers'][$k] = $v;
         }
-        foreach ($req->query->all() as $k => $v) {
+        foreach ($request->query->all() as $k => $v) {
             $ret['query'][$k] = $v;
         }
-        $response = new JsonResponse($ret);
 
-        return $response;
-    }
-);
-$app->match(
-    'error_random',
-    function (Request $request) {
+        echo json_encode($ret);
+        break;
+
+    case 'error_random':
         $statusCode = time() % 3 <= 0 ? 200 : 502;
+        http_response_code($statusCode);
+        echo json_encode([]);
+        break;
 
-        return new JsonResponse([], $statusCode);
-    }
-);
-$app->match(
-    'always_error',
-    function (Request $request) {
-        return new JsonResponse([], 502);
-    }
-);
+    case 'always_error':
+        http_response_code(502);
+        echo json_encode([]);
+        break;
 
-$app->match(
-    'post-html-form',
-    function (Request $request) {   
-        return new JsonResponse([
+    case 'post-html-form':
+        echo json_encode([
             'content_type_header_value' => $request->headers->get('content-type'),
             'post_fields_count' => $request->request->count(),
             'post_fields' => $request->request->all(),
         ]);
-    }
-);
+        break;
 
-$app->match(
-    'post-html-form-with-files',
-    function (Request $request) {   
-        return new JsonResponse([
+    case 'post-html-form-with-files':
+        echo json_encode([
             'content_type_header_value' => $request->headers->get('content-type'),
             'post_files_count' => count($request->files),
             'post_fields_count' => $request->request->count(),
             'post_fields' => $request->request->all(),
         ]);
-    }
-);
+        break;
 
-$app->run();
+    default:
+        http_response_code(404);
+        echo json_encode(['error' => 'Not found']);
+        break;
+}
