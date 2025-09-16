@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Rest;
 
 use Psr\Http\Message\ResponseInterface;
@@ -7,9 +9,9 @@ use Psr\Http\Message\RequestInterface;
 
 class HttpExchangeFormatter
 {
-    private $request;
+    private ?RequestInterface $request;
 
-    private $response;
+    private ?ResponseInterface $response;
 
     public function __construct(RequestInterface $request = null, ResponseInterface $response = null)
     {
@@ -17,9 +19,9 @@ class HttpExchangeFormatter
         $this->response = $response;
     }
 
-    public function formatRequest()
+    public function formatRequest(): string
     {
-        if (null === $this->request) {
+        if (!$this->request instanceof RequestInterface) {
             throw new \LogicException('You should send a request before printing it.');
         }
 
@@ -32,9 +34,9 @@ class HttpExchangeFormatter
         );
     }
 
-    public function formatFullExchange()
+    public function formatFullExchange(): string
     {
-        if (null === $this->request || null === $this->response) {
+        if (!$this->request instanceof RequestInterface || !$this->response instanceof ResponseInterface) {
             throw new \LogicException('You should send a request and store its response before printing them.');
         }
 
@@ -49,19 +51,13 @@ class HttpExchangeFormatter
         );
     }
 
-    /**
-     * @param array $headers
-     *
-     * @return string
-     */
-    private function getRawHeaders(array $headers)
+    private function getRawHeaders(array $headers): string
     {
         $rawHeaders = '';
         foreach ($headers as $key => $value) {
             $rawHeaders .= sprintf("%s: %s\n", $key, is_array($value) ? implode(', ', $value) : $value);
         }
-        $rawHeaders .= "\n";
 
-        return $rawHeaders;
+        return $rawHeaders . "\n";
     }
 }

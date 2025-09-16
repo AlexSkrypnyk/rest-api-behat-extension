@@ -75,7 +75,7 @@ Feature: Test json inspection payload
 
     Scenario: JSON should be valid against inline json schema
         Then the JSON should be valid according to this schema:
-            """
+        """
             {
                 "type": "object",
                 "$schema": "http://json-schema.org/draft-03/schema",
@@ -154,6 +154,6 @@ Feature: Test json inspection payload
     Scenario: JSON path expression have result
         Then the JSON path expression "fooo.foo" should have result
 
-    Scenario: JSON path expression have result
+    Scenario: JSON path expression should not have result
         Then the JSON path expression "fooo.bar" should not have result
         Then the JSON path expression "foos[?foo == 'nobar'].bar" should not have result

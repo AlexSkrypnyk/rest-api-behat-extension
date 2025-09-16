@@ -1,23 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Rest;
 
+use mock\Psr\Http\Message\UriInterface;
+use mock\Psr\Http\Message\RequestInterface;
+use mock\Psr\Http\Message\StreamInterface;
+use mock\Psr\Http\Message\ResponseInterface;
 use atoum;
 
 class WrongResponseExpectation extends atoum
 {
-    public function test_it_display_pretty_response_when_cast_to_string()
+    public function testItDisplayPrettyResponseWhenCastToString(): void
     {
         $this
             ->given(
-                $uri = new \mock\Psr\Http\Message\UriInterface(),
+                $uri = new UriInterface(),
                 $this->calling($uri)->__toString = 'http://test.com/foo',
-                $request = new \mock\Psr\Http\Message\RequestInterface(),
+                $request = new RequestInterface(),
                 $this->calling($request)->getMethod = 'GET',
                 $this->calling($request)->getUri = $uri,
-                $stream = new \mock\Psr\Http\Message\StreamInterface(),
+                $stream = new StreamInterface(),
                 $this->calling($stream)->__toString = '{"status":"ok"}',
-                $response = new \mock\Psr\Http\Message\ResponseInterface(),
+                $response = new ResponseInterface(),
                 $this->calling($response)->getStatusCode = 200,
                 $this->calling($response)->getReasonPhrase = 'OK',
                 $this->calling($response)->getHeaders = ['Content-Type' => 'application/json'],

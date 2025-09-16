@@ -34,11 +34,16 @@
         "tolerance/tolerance": "^0.4.2"
     },
     "require-dev": {
+        "dantleech/gherkin-lint": "^0.2.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
         "ergebnis/composer-normalize": "^2.48",
         "guzzlehttp/psr7": "^2.0",
         "http-interop/http-factory-guzzle": "^1.1.1",
         "php-http/guzzle7-adapter": "^0.1.1",
         "php-http/mock-client": "^1.0",
+        "phpstan/phpstan": "^2",
+        "rector/rector": "^2.1",
+        "squizlabs/php_codesniffer": "^4.0",
         "symfony/process": "^7.0"
     },
     "replace": {
@@ -53,6 +58,7 @@
     },
     "config": {
         "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
             "ergebnis/composer-normalize": true,
             "php-http/discovery": true
         },
@@ -62,5 +68,21 @@
         "branch-alias": {
             "dev-master": "6.x-dev"
         }
+    },
+    "scripts": {
+        "lint": [
+            "phpcs",
+            "rector --clear-cache --dry-run",
+            "gherkinlint lint features"
+        ],
+        "lint-fix": [
+            "phpcbf",
+            "rector --clear-cache"
+        ],
+        "reset": "rm -Rf vendor vendor-bin composer.lock",
+        "start-server": "php -S 127.0.0.1:8888 -t \"$(pwd)/www\" &",
+        "stop-server": "kill -9 $(lsof -t -i:8888)",
+        "test-atoum": "vendor/bin/atoum -ulr",
+        "test-behat": "vendor/bin/behat -f progress"
     }
 }

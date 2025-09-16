@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 use Behat\Behat\Context\Argument\ArgumentResolver;
 
 class JsonInspectorResolver implements ArgumentResolver
 {
-    private $jsonInspector;
+    private JsonInspector $jsonInspector;
 
     public function __construct(JsonInspector $jsonInspector)
     {
@@ -22,7 +24,9 @@ class JsonInspectorResolver implements ArgumentResolver
 
         $parameters = $constructor->getParameters();
         foreach ($parameters as $parameter) {
-            if (null !== $parameter->getType() && ($parameter->getType()->getName()) === 'Ubirak\RestApiBehatExtension\Json\JsonInspector') {
+            if ($parameter->getType() instanceof \ReflectionType &&
+                ($parameter->getType()->getName()) === JsonInspector::class
+            ) {
                 $arguments[$parameter->name] = $this->jsonInspector;
             }
         }

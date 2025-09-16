@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Rest;
 
 use Behat\Behat\Context\Argument\ArgumentResolver;
 
 class RestApiBrowserResolver implements ArgumentResolver
 {
-    private $restApiBrowser;
+    private RestApiBrowser $restApiBrowser;
 
     public function __construct(RestApiBrowser $restApiBrowser)
     {
@@ -22,7 +24,9 @@ class RestApiBrowserResolver implements ArgumentResolver
 
         $parameters = $constructor->getParameters();
         foreach ($parameters as $parameter) {
-            if (null !== $parameter->getType() && ($parameter->getType()->getName()) === 'Ubirak\RestApiBehatExtension\Rest\RestApiBrowser') {
+            if ($parameter->getType() instanceof \ReflectionType &&
+                ($parameter->getType()->getName()) === RestApiBrowser::class
+            ) {
                 $arguments[$parameter->name] = $this->restApiBrowser;
             }
         }

@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Json;
 
+use Ubirak\RestApiBehatExtension\Json\Json;
 use atoum;
 
 class WrongJsonExpectation extends atoum
 {
-    public function test_it_display_pretty_json_when_cast_to_string()
+    public function testItDisplayPrettyJsonWhenCastToString(): void
     {
         $this
             ->given(
-                $json = new \Ubirak\RestApiBehatExtension\Json\Json('{"foo":"bar"}'),
+                $json = new Json('{"foo":"bar"}'),
                 $this->newTestedInstance('Error', $json)
             )
             ->when(

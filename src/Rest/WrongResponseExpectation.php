@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Rest;
 
 use Ubirak\RestApiBehatExtension\ExpectationFailed;
@@ -8,9 +10,9 @@ use Psr\Http\Message\RequestInterface;
 
 class WrongResponseExpectation extends ExpectationFailed
 {
-    private $request;
+    private RequestInterface $request;
 
-    private $response;
+    private ResponseInterface $response;
 
     public function __construct($message, RequestInterface $request, ResponseInterface $response, $previous = null)
     {
@@ -19,7 +21,7 @@ class WrongResponseExpectation extends ExpectationFailed
         parent::__construct($message, 0, $previous);
     }
 
-    public function getContextText()
+    public function getContextText(): string
     {
         $formatter = new HttpExchangeFormatter($this->request, $this->response);
 

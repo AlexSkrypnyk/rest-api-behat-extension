@@ -1,0 +1,19 @@
+{
+    "rules": {
+        "indentation": {
+            "width": 4
+        },
+        "keyword-order": {
+            "enabled": false
+        },
+        "filename": {
+            "enabled": false
+        },
+        "no-homogenous-tags": {
+            "enabled": false
+        },
+        "scenario-size": {
+            "enabled": false
+        }
+    }
+}

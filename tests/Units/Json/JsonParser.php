@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Json;
 
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use mock\Ubirak\RestApiBehatExtension\Json\Json;
+use mock\Ubirak\RestApiBehatExtension\Json\JsonSchema;
 use atoum;
 use JsonSchema\Validator;
 use Ubirak\RestApiBehatExtension\Json\JsonParser as SUT;
 
 class JsonParser extends atoum
 {
-    private function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        return \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessorBuilder()
+        return PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
     }
-    public function test_should_read_json()
+    public function testShouldReadJson(): void
     {
         $this
             ->given(
-                $json = new \mock\Ubirak\RestApiBehatExtension\Json\Json('{}'),
+                $json = new Json('{}'),
                 $json->getMockController()->read = 'foobar'
             )
             ->and(
@@ -38,28 +44,28 @@ class JsonParser extends atoum
         ;
     }
 
-    public function test_should_fail_if_json_reading_fail()
+    public function testShouldFailIfJsonReadingFail(): void
     {
         $this
             ->given(
-                $json = new \mock\Ubirak\RestApiBehatExtension\Json\Json('{}'),
+                $json = new Json('{}'),
                 $json->getMockController()->read->throw = new \Exception()
             )
             ->and(
                 $sut = new SUT('mode')
             )
-                ->exception(function () use ($json, $sut) {
+                ->exception(function () use ($json, $sut): void {
                     $sut->evaluate($json, 'foo.bar');
                 })
                     ->hasMessage('Failed to evaluate expression "foo.bar"')
         ;
     }
 
-    public function test_should_convert_expression_if_javascript_mode()
+    public function testShouldConvertExpressionIfJavascriptMode(): void
     {
         $this
             ->given(
-                $json = new \mock\Ubirak\RestApiBehatExtension\Json\Json('{}'),
+                $json = new Json('{}'),
                 $json->getMockController()->read = 'foobar'
             )
             ->and(
@@ -79,11 +85,11 @@ class JsonParser extends atoum
         ;
     }
 
-    public function test_should_no_convert_expression_if_no_javascript_mode()
+    public function testShouldNoConvertExpressionIfNoJavascriptMode(): void
     {
         $this
             ->given(
-                $json = new \mock\Ubirak\RestApiBehatExtension\Json\Json('{}'),
+                $json = new Json('{}'),
                 $json->getMockController()->read = 'foobar'
             )
             ->and(
@@ -103,12 +109,12 @@ class JsonParser extends atoum
         ;
     }
 
-    public function test_should_valid_json_through_its_schema()
+    public function testShouldValidJsonThroughItsSchema(): void
     {
         $this
             ->given(
-                $json = new \mock\Ubirak\RestApiBehatExtension\Json\Json('{}'),
-                $schema = new \mock\Ubirak\RestApiBehatExtension\Json\JsonSchema('{}'),
+                $json = new Json('{}'),
+                $schema = new JsonSchema('{}'),
                 $schema->getMockController()->validate = 'foobar',
                 $sut = new SUT('foo')
             )

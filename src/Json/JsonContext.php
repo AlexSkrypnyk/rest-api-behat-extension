@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 use atoum\atoum\asserter\generator as asserter;
@@ -9,11 +11,11 @@ use Behat\Gherkin\Node\PyStringNode;
 
 class JsonContext implements Context, SnippetAcceptingContext
 {
-    private $jsonInspector;
+    private JsonInspector $jsonInspector;
 
-    private $asserter;
+    private asserter $asserter;
 
-    private $jsonSchemaBaseUrl;
+    private ?string $jsonSchemaBaseUrl = null;
 
     public function __construct(JsonInspector $jsonInspector, $jsonSchemaBaseUrl = null)
     {
@@ -29,7 +31,7 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @When /^I load JSON:$/
      */
-    public function iLoadJson(PyStringNode $jsonContent)
+    public function iLoadJson(PyStringNode $jsonContent): void
     {
         $this->jsonInspector->writeJson((string) $jsonContent);
     }
@@ -37,7 +39,7 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the response should be in JSON$/
      */
-    public function responseShouldBeInJson()
+    public function responseShouldBeInJson(): void
     {
         $this->jsonInspector->readJson();
     }
@@ -45,9 +47,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON node "(?P<jsonNode>[^"]*)" should be equal to "(?P<expectedValue>.*)"$/
      */
-    public function theJsonNodeShouldBeEqualTo($jsonNode, $expectedValue)
+    public function theJsonNodeShouldBeEqualTo($jsonNode, $expectedValue): void
     {
-        $this->assert(function () use ($jsonNode, $expectedValue) {
+        $this->assert(function () use ($jsonNode, $expectedValue): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $expectedValue = $this->evaluateExpectedValue($expectedValue);
             $this->asserter->variable($realValue)->isEqualTo($expectedValue);
@@ -58,9 +60,9 @@ class JsonContext implements Context, SnippetAcceptingContext
      * @Then /^the JSON node "(?P<jsonNode>[^"]*)" should have (?P<expectedNth>\d+) elements?$/
      * @Then /^the JSON array node "(?P<jsonNode>[^"]*)" should have (?P<expectedNth>\d+) elements?$/
      */
-    public function theJsonNodeShouldHaveElements($jsonNode, $expectedNth)
+    public function theJsonNodeShouldHaveElements($jsonNode, $expectedNth): void
     {
-        $this->assert(function () use ($jsonNode, $expectedNth) {
+        $this->assert(function () use ($jsonNode, $expectedNth): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $this->asserter->phpArray($realValue)->hasSize($expectedNth);
         });
@@ -69,9 +71,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON array node "(?P<jsonNode>[^"]*)" should contain "(?P<expectedValue>.*)" element$/
      */
-    public function theJsonArrayNodeShouldContainElements($jsonNode, $expectedValue)
+    public function theJsonArrayNodeShouldContainElements($jsonNode, $expectedValue): void
     {
-        $this->assert(function () use ($jsonNode, $expectedValue) {
+        $this->assert(function () use ($jsonNode, $expectedValue): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $this->asserter->phpArray($realValue)->contains($expectedValue);
         });
@@ -80,9 +82,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON array node "(?P<jsonNode>[^"]*)" should not contain "(?P<expectedValue>.*)" element$/
      */
-    public function theJsonArrayNodeShouldNotContainElements($jsonNode, $expectedValue)
+    public function theJsonArrayNodeShouldNotContainElements($jsonNode, $expectedValue): void
     {
-        $this->assert(function () use ($jsonNode, $expectedValue) {
+        $this->assert(function () use ($jsonNode, $expectedValue): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $this->asserter->phpArray($realValue)->notContains($expectedValue);
         });
@@ -91,9 +93,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON node "(?P<jsonNode>[^"]*)" should contain "(?P<expectedValue>.*)"$/
      */
-    public function theJsonNodeShouldContain($jsonNode, $expectedValue)
+    public function theJsonNodeShouldContain($jsonNode, $expectedValue): void
     {
-        $this->assert(function () use ($jsonNode, $expectedValue) {
+        $this->assert(function () use ($jsonNode, $expectedValue): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $this->asserter->string((string) $realValue)->contains($expectedValue);
         });
@@ -104,9 +106,9 @@ class JsonContext implements Context, SnippetAcceptingContext
      *
      * @Then /^the JSON node "(?P<jsonNode>[^"]*)" should not contain "(?P<unexpectedValue>.*)"$/
      */
-    public function theJsonNodeShouldNotContain($jsonNode, $unexpectedValue)
+    public function theJsonNodeShouldNotContain($jsonNode, $unexpectedValue): void
     {
-        $this->assert(function () use ($jsonNode, $unexpectedValue) {
+        $this->assert(function () use ($jsonNode, $unexpectedValue): void {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
             $this->asserter->string((string) $realValue)->notContains($unexpectedValue);
         });
@@ -117,12 +119,16 @@ class JsonContext implements Context, SnippetAcceptingContext
      *
      * @Given /^the JSON node "(?P<jsonNode>[^"]*)" should exist$/
      */
-    public function theJsonNodeShouldExist($jsonNode)
+    public function theJsonNodeShouldExist($jsonNode): void
     {
         try {
             $this->evaluateJsonNodeValue($jsonNode);
-        } catch (\Exception $e) {
-            throw new WrongJsonExpectation(sprintf("The node '%s' does not exist.", $jsonNode), $this->readJson(), $e);
+        } catch (\Exception $exception) {
+            throw new WrongJsonExpectation(
+                sprintf("The node '%s' does not exist.", $jsonNode),
+                $this->readJson(),
+                $exception
+            );
         }
     }
 
@@ -131,33 +137,31 @@ class JsonContext implements Context, SnippetAcceptingContext
      *
      * @Given /^the JSON node "(?P<jsonNode>[^"]*)" should not exist$/
      */
-    public function theJsonNodeShouldNotExist($jsonNode)
+    public function theJsonNodeShouldNotExist($jsonNode): void
     {
-        $e = null;
-
         try {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
-        } catch (\Exception $e) {
-            // If the node does not exist an exception should be throwed
-        }
-
-        if ($e === null) {
+            // If we get here, the node exists when it should not
             throw new WrongJsonExpectation(
                 sprintf("The node '%s' exists and contains '%s'.", $jsonNode, json_encode($realValue)),
-                $this->readJson(),
-                $e
+                $this->readJson()
             );
+        } catch (WrongJsonExpectation $exception) {
+            // Re-throw WrongJsonExpectation as it contains our desired error message
+            throw $exception;
+        } catch (\Exception $exception) {
+            // If the node does not exist an exception should be thrown - this is expected behavior
         }
     }
 
     /**
      * @Then /^the JSON should be valid according to this schema:$/
      */
-    public function theJsonShouldBeValidAccordingToThisSchema(PyStringNode $jsonSchemaContent)
+    public function theJsonShouldBeValidAccordingToThisSchema(PyStringNode $jsonSchemaContent): void
     {
         $tempFilename = tempnam(sys_get_temp_dir(), 'rae');
         file_put_contents($tempFilename, $jsonSchemaContent);
-        $this->assert(function () use ($tempFilename) {
+        $this->assert(function () use ($tempFilename): void {
             $this->jsonInspector->validateJson(
                 new JsonSchema($tempFilename)
             );
@@ -168,11 +172,11 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON should be valid according to the schema "(?P<filename>[^"]*)"$/
      */
-    public function theJsonShouldBeValidAccordingToTheSchema($filename)
+    public function theJsonShouldBeValidAccordingToTheSchema($filename): void
     {
         $filename = $this->resolveFilename($filename);
 
-        $this->assert(function () use ($filename) {
+        $this->assert(function () use ($filename): void {
             $this->jsonInspector->validateJson(
                 new JsonSchema($filename)
             );
@@ -182,17 +186,17 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON should be equal to:$/
      */
-    public function theJsonShouldBeEqualTo(PyStringNode $jsonContent)
+    public function theJsonShouldBeEqualTo(PyStringNode $jsonContent): void
     {
         $realJsonValue = $this->readJson();
 
         try {
             $expectedJsonValue = new Json($jsonContent);
-        } catch (\Exception $e) {
-            throw new \Exception('The expected JSON is not a valid');
+        } catch (\Exception $exception) {
+            throw new \Exception('The expected JSON is not a valid', $exception->getCode(), $exception);
         }
 
-        $this->assert(function () use ($realJsonValue, $expectedJsonValue) {
+        $this->assert(function () use ($realJsonValue, $expectedJsonValue): void {
             $this->asserter->castToString($realJsonValue)->isEqualTo((string) $expectedJsonValue);
         });
     }
@@ -200,7 +204,7 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then the JSON path expression :pathExpression should be equal to json :expectedJson
      */
-    public function theJsonPathExpressionShouldBeEqualToJson($pathExpression, $expectedJson)
+    public function theJsonPathExpressionShouldBeEqualToJson($pathExpression, $expectedJson): void
     {
         $expectedJson = new Json($expectedJson);
         $actualJson = Json::fromRawContent($this->jsonInspector->searchJsonPath($pathExpression));
@@ -211,7 +215,7 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then the JSON path expression :pathExpression should be equal to:
      */
-    public function theJsonExpressionShouldBeEqualTo($pathExpression, PyStringNode $expectedJson)
+    public function theJsonExpressionShouldBeEqualTo($pathExpression, PyStringNode $expectedJson): void
     {
         $this->theJsonPathExpressionShouldBeEqualToJson($pathExpression, (string) $expectedJson);
     }
@@ -219,7 +223,7 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then the JSON path expression :pathExpression should have result
      */
-    public function theJsonPathExpressionShouldHaveResult($pathExpression)
+    public function theJsonPathExpressionShouldHaveResult($pathExpression): void
     {
         $json = $this->jsonInspector->searchJsonPath($pathExpression);
         $this->asserter->variable($json)->isNotNull();
@@ -229,10 +233,10 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then the JSON path expression :pathExpression should not have result
      */
-    public function theJsonPathExpressionShouldNotHaveResult($pathExpression)
+    public function theJsonPathExpressionShouldNotHaveResult($pathExpression): void
     {
         $json = $this->jsonInspector->searchJsonPath($pathExpression);
-        if (is_array($json) && empty($json)) {
+        if ($json === []) {
             $this->asserter->variable($json)->isEqualTo([]);
         } else {
             $this->asserter->variable($json)->isNull();
@@ -257,14 +261,14 @@ class JsonContext implements Context, SnippetAcceptingContext
         return $expectedValue;
     }
 
-    private function readJson()
+    private function readJson(): Json
     {
         return $this->jsonInspector->readJson();
     }
 
     private function resolveFilename($filename)
     {
-        if (true === is_file($filename)) {
+        if (is_file($filename)) {
             return realpath($filename);
         }
 
@@ -287,12 +291,12 @@ class JsonContext implements Context, SnippetAcceptingContext
         return realpath($filename);
     }
 
-    private function assert(callable $assertion)
+    private function assert(callable $assertion): void
     {
         try {
             $assertion();
-        } catch (\Exception $e) {
-            throw new WrongJsonExpectation($e->getMessage(), $this->readJson(), $e);
+        } catch (\Exception $exception) {
+            throw new WrongJsonExpectation($exception->getMessage(), $this->readJson(), $exception);
         }
     }
 }

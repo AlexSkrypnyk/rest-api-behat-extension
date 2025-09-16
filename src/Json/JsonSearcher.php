@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
+
+use JmesPath\Env;
 
 /**
  * Use https://github.com/jmespath/jmespath.php
@@ -10,6 +14,6 @@ class JsonSearcher
 {
     public function search(Json $json, $pathExpression)
     {
-        return \JmesPath\Env::search($pathExpression, $json->getRawContent());
+        return Env::search($pathExpression, $json->getRawContent());
     }
 }

@@ -1,24 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Json;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use atoum;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Ubirak\RestApiBehatExtension\Json\Json as SUT;
 
 class Json extends atoum
 {
-    public function test_should_not_decode_invalid_json()
+    public function testShouldNotDecodeInvalidJson(): void
     {
         $this
-            ->exception(function () {
+            ->exception(function (): void {
                 $sut = new SUT('{{json');
             })
                 ->hasMessage('The string "{{json" is not valid json')
         ;
     }
 
-    public function test_should_decode_valid_json()
+    public function testShouldDecodeValidJson(): void
     {
         try {
             $this
@@ -29,14 +32,14 @@ class Json extends atoum
                     new SUT('{"foo": "bar"}')
                 )
             ;
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $hasException = true;
         }
 
         $this->boolean($hasException)->isFalse();
     }
 
-    public function test_should_encode_valid_json()
+    public function testShouldEncodeValidJson(): void
     {
         $this
             ->given(
@@ -51,21 +54,21 @@ class Json extends atoum
         ;
     }
 
-    public function test_should_not_read_invalid_expression()
+    public function testShouldNotReadInvalidExpression(): void
     {
         $this
             ->given(
                 $accessor = PropertyAccess::createPropertyAccessor(),
                 $sut = new SUT('{"foo":"bar"}')
             )
-            ->exception(function () use ($sut, $accessor) {
+            ->exception(function () use ($sut, $accessor): void {
                 $sut->read('jeanmarc', $accessor);
             })
-                ->isInstanceOf('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException')
+                ->isInstanceOf(NoSuchPropertyException::class)
         ;
     }
 
-    public function test_should_read_valid_expression()
+    public function testShouldReadValidExpression(): void
     {
         $stringAsserterFunc = class_exists('mageekguy\\atoum\\asserters\\phpString') ? 'phpString' : 'string';
         $this

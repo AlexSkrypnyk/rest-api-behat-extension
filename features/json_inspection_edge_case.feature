@@ -61,7 +61,7 @@ Feature: Test json inspection edge cases
         The node 'foo2' does not exist.
         """
 
-     Scenario: Testing the unexistence of existing json node
+    Scenario: Testing the unexistence of existing json node
         Given a file named "features/existing_json.feature" with:
         """
         Feature: Test unexistence of existing json node

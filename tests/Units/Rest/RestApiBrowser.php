@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Rest;
 
+use Http\Mock\Client;
+use Http\Message\MessageFactory\GuzzleMessageFactory;
 use atoum;
 use Ubirak\RestApiBehatExtension\Rest\RestApiBrowser as SUT;
 
@@ -16,7 +20,7 @@ class RestApiBrowser extends atoum
      *
      * @dataProvider addHeaderDataProvider
      */
-    public function testAddRequestHeader(array $addHeadersSteps, array $expectedHeaders)
+    public function testAddRequestHeader(array $addHeadersSteps, array $expectedHeaders): void
     {
         $this
             ->given(
@@ -50,7 +54,7 @@ class RestApiBrowser extends atoum
      *
      * @dataProvider setHeaderDataProvider
      */
-    public function testSetRequestHeader(array $setHeadersSteps, array $expectedHeaders)
+    public function testSetRequestHeader(array $setHeadersSteps, array $expectedHeaders): void
     {
         $this
             ->given(
@@ -86,7 +90,7 @@ class RestApiBrowser extends atoum
      * @param string $stepUrl
      * @param string $expectedUrl
      */
-    public function test_create_request_with_slashes_to_clean($baseUrl, $stepUrl, $expectedUrl)
+    public function testCreateRequestWithSlashesToClean($baseUrl, $stepUrl, $expectedUrl): void
     {
         // Given
         $mockHttpClient = $this->mockHttpClient(200);
@@ -128,9 +132,8 @@ class RestApiBrowser extends atoum
      * @dataProvider responseDataProvider
      *
      * @param int   $statusCode
-     * @param array $responseHeaders
      */
-    public function test_get_return_the_response_we_expected($statusCode, array $responseHeaders)
+    public function testGetReturnTheResponseWeExpected($statusCode, array $responseHeaders): void
     {
         // Given
         $mockHttpClient = $this->mockHttpClient($statusCode, $responseHeaders);
@@ -169,14 +172,13 @@ class RestApiBrowser extends atoum
     /**
      * @param string $baseUrl
      * @param int    $responseStatusCode
-     * @param array  $headers
      *
      * @return \Ivory\HttpAdapter\HttpAdapterInterface
      */
-    private function mockHttpClient($responseStatusCode, array $headers = [])
+    private function mockHttpClient($responseStatusCode, array $headers = []): Client
     {
-        $mockHttpClient = new \Http\Mock\Client();
-        $messageFactory = new \Http\Message\MessageFactory\GuzzleMessageFactory();
+        $mockHttpClient = new Client();
+        $messageFactory = new GuzzleMessageFactory();
         $mockHttpClient->addResponse(
             $messageFactory->createResponse(
                 $responseStatusCode,
