@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 class JsonInspector
 {
-    private $jsonParser;
+    private JsonParser $jsonParser;
 
-    private $jsonStorage;
+    private JsonStorage $jsonStorage;
 
-    private $jsonSearcher;
+    private JsonSearcher $jsonSearcher;
 
     public function __construct(JsonStorage $jsonStorage, JsonParser $jsonParser, JsonSearcher $jsonSearcher)
     {
@@ -30,7 +32,7 @@ class JsonInspector
         return $this->jsonSearcher->search($this->readJson(), $pathExpression);
     }
 
-    public function validateJson(JsonSchema $jsonSchema)
+    public function validateJson(JsonSchema $jsonSchema): void
     {
         $this->jsonParser->validate(
             $this->readJson(),
@@ -38,12 +40,12 @@ class JsonInspector
         );
     }
 
-    public function readJson()
+    public function readJson(): Json
     {
         return $this->jsonStorage->readJson();
     }
 
-    public function writeJson($jsonContent)
+    public function writeJson($jsonContent): void
     {
         $this->jsonStorage->writeRawContent($jsonContent);
     }

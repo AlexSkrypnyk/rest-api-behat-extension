@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use JsonSchema\Validator;
 use JsonSchema\SchemaStorage;
 use JsonSchema\Uri\UriRetriever;
@@ -12,7 +15,7 @@ class JsonParser
 {
     private $evaluationMode;
 
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct($evaluationMode)
     {
@@ -31,12 +34,12 @@ class JsonParser
 
         try {
             return $json->read($expression, $this->propertyAccessor);
-        } catch (\Exception $e) {
-            throw new \Exception(sprintf('Failed to evaluate expression "%s"', $expression), 0, $e);
+        } catch (\Exception $exception) {
+            throw new \Exception(sprintf('Failed to evaluate expression "%s"', $expression), 0, $exception);
         }
     }
 
-    public function validate(Json $json, JsonSchema $schema)
+    public function validate(Json $json, JsonSchema $schema): bool
     {
         return $schema->validate($json, new Validator(), new SchemaStorage(new UriRetriever(), new UriResolver()));
     }

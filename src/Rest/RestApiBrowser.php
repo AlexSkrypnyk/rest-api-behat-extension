@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Rest;
 
+use Ubirak\RestApiBehatExtension\Html\Form;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
@@ -14,6 +17,7 @@ use Tolerance\Operation\Runner\RetryOperationRunner;
 use Tolerance\Operation\Runner\CallbackOperationRunner;
 use Tolerance\Waiter\SleepWaiter;
 use Tolerance\Waiter\TimeOut;
+use GuzzleHttp\Psr7\MultipartStream;
 
 class RestApiBrowser
 {
@@ -26,11 +30,9 @@ class RestApiBrowser
     /** @var ResponseInterface */
     private $response;
 
-    /** @var array */
-    private $requestHeaders = [];
+    private array $requestHeaders = [];
 
-    /** @var ResponseStorage */
-    private $responseStorage;
+    private ?ResponseStorage $responseStorage = null;
 
     /** @var string */
     private $host;
@@ -55,15 +57,12 @@ class RestApiBrowser
     /**
      * Allow to override the httpClient to use yours with specific middleware for example.
      */
-    public function useHttpClient(ClientInterface $httpClient)
+    public function useHttpClient(ClientInterface $httpClient): void
     {
         $this->httpClient = $httpClient;
     }
 
-    /**
-     * @param ResponseStorage $responseStorage
-     */
-    public function enableResponseStorage(ResponseStorage $responseStorage)
+    public function enableResponseStorage(ResponseStorage $responseStorage): void
     {
         $this->responseStorage = $responseStorage;
     }
@@ -76,10 +75,7 @@ class RestApiBrowser
         return $this->response;
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
-    public function setResponse(ResponseInterface $response)
+    public function setResponse(ResponseInterface $response): void
     {
         $this->response = $response;
     }
@@ -89,24 +85,23 @@ class RestApiBrowser
         return $this->request;
     }
 
-    public function getRequestHeaders()
+    public function getRequestHeaders(): array
     {
         return $this->requestHeaders;
     }
 
     /**
-     * @param string       $method
      * @param string       $uri
      * @param string|array $body
      */
-    public function sendRequest($method, $uri, $body = null)
+    public function sendRequest(string $method, $uri, $body = null): void
     {
         if (false === $this->hasHost($uri)) {
             $uri = rtrim($this->host, '/').'/'.ltrim($uri, '/');
         }
 
         if (is_array($body)) {
-            $html = new \Ubirak\RestApiBehatExtension\Html\Form($body);
+            $html = new Form($body);
             $body = $html->getBody();
             $this->setRequestHeader('Content-Type', $html->getContentTypeHeaderValue());
         }
@@ -116,18 +111,22 @@ class RestApiBrowser
             $this->request = $this->request->withHeader($keyHeader, $valueHeader);
         }
         if (null !== $body) {
-            $this->request = $this->request->withBody($this->streamFactory->createStream($body));
+            if ($body instanceof MultipartStream) {
+                $this->request = $this->request->withBody($body);
+            } else {
+                $this->request = $this->request->withBody($this->streamFactory->createStream($body));
+            }
         }
 
         $this->response = $this->httpClient->sendRequest($this->request);
         $this->requestHeaders = [];
 
-        if (null !== $this->responseStorage) {
+        if ($this->responseStorage instanceof ResponseStorage) {
             $this->responseStorage->writeRawContent((string) $this->response->getBody());
         }
     }
 
-    public function sendRequestUntil($method, $uri, $body, callable $assertion, $maxExecutionTime = 10)
+    public function sendRequestUntil(string $method, $uri, $body, callable $assertion, $maxExecutionTime = 10): void
     {
         $runner = new RetryOperationRunner(
             new CallbackOperationRunner(),
@@ -143,9 +142,8 @@ class RestApiBrowser
 
     /**
      * @param string $name
-     * @param string $value
      */
-    public function setRequestHeader($name, $value)
+    public function setRequestHeader($name, string $value): void
     {
         $this->removeRequestHeader($name);
         $this->addRequestHeader($name, $value);
@@ -153,9 +151,8 @@ class RestApiBrowser
 
     /**
      * @param string $name
-     * @param string $value
      */
-    public function addRequestHeader($name, $value)
+    public function addRequestHeader($name, string $value): void
     {
         $name = strtolower($name);
         if (isset($this->requestHeaders[$name])) {
@@ -168,7 +165,7 @@ class RestApiBrowser
     /**
      * @param string $headerName
      */
-    private function removeRequestHeader($headerName)
+    private function removeRequestHeader($headerName): void
     {
         $headerName = strtolower($headerName);
         if (array_key_exists($headerName, $this->requestHeaders)) {
@@ -178,10 +175,8 @@ class RestApiBrowser
 
     /**
      * @param string $uri
-     *
-     * @return bool
      */
-    private function hasHost($uri)
+    private function hasHost($uri): bool
     {
         return false !== strpos($uri, '://');
     }

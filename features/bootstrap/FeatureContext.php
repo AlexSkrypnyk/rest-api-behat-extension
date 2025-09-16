@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+use atoum\atoum\asserter\generator;
+
 use atoum\atoum\asserter;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
@@ -8,28 +12,30 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
- * Test workflow totally copied from https://github.com/Behat/WebApiExtension/blob/master/features/bootstrap/FeatureContext.php
+ * phpcs:disable Generic.Files.LineLength.TooLong
+ * phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
+ * @see https://github.com/Behat/WebApiExtension/blob/master/features/bootstrap/FeatureContext.php
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
-    private $phpBin;
+    private ?string $phpBin = null;
 
-    private $process;
+    private ?Process $process = null;
 
-    private $workingDir;
+    private ?string $workingDir = null;
 
-    private $asserter;
+    private generator $asserter;
 
     public function __construct()
     {
-        $this->asserter = new asserter\generator();
+        $this->asserter = new generator();
     }
 
     /**
      * @BeforeSuite
      * @AfterSuite
      */
-    public static function cleanTestFolders()
+    public static function cleanTestFolders(): void
     {
         $dir = self::workingDir();
 
@@ -41,9 +47,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @BeforeScenario
      */
-    public function prepareScenario()
+    public function prepareScenario(): void
     {
-        $dir = self::workingDir() . DIRECTORY_SEPARATOR . (md5(microtime(true) * rand(0, 10000)));
+        $dir = self::workingDir() . DIRECTORY_SEPARATOR . (md5((string)(microtime(true) * rand(0, 10000))));
         mkdir($dir . '/features/bootstrap', 0777, true);
 
         $phpFinder = new PhpExecutableFinder();
@@ -59,7 +65,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given /^a file named "(?P<filename>[^"]*)" with:$/
      */
-    public function aFileNamedWith($filename, PyStringNode $fileContent)
+    public function aFileNamedWith(string $filename, PyStringNode $fileContent): void
     {
         $content = strtr((string) $fileContent, array("'''" => '"""'));
         $this->createFile($this->workingDir . '/' . $filename, $content);
@@ -68,9 +74,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @When /^I run behat "(?P<arguments>[^"]*)"$/
      */
-    public function iRunBehat($arguments)
+    public function iRunBehat($arguments): void
     {
-        $argumentsString = strtr($arguments, array('\'' => '"'));
+        $argumentsString = strtr($arguments, array("'" => '"'));
 
         $commandLine = sprintf(
             '%s %s %s %s',
@@ -89,7 +95,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^it should (fail|pass) with:$/
      */
-    public function itShouldTerminateWithStatusAndContent($exitStatus, PyStringNode $string)
+    public function itShouldTerminateWithStatusAndContent($exitStatus, PyStringNode $string): void
     {
         if ('fail' === $exitStatus) {
             $this->asserter->integer($this->getExitCode())->isEqualTo(1);
@@ -103,12 +109,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $this->asserter->$stringAsserterFunc($this->getOutput())->contains((string) $string);
     }
 
-    private function getExitCode()
+    private function getExitCode(): ?int
     {
         return $this->process->getExitCode();
     }
 
-    private function getOutput()
+    private function getOutput(): string
     {
         $output = $this->process->getErrorOutput() . $this->process->getOutput();
 
@@ -120,7 +126,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         return trim(preg_replace("/ +$/m", '', $output));
     }
 
-    private function createFile($filename, $content)
+    private function createFile(string $filename, string $content): void
     {
         $path = dirname($filename);
 
@@ -131,12 +137,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
         file_put_contents($filename, $content);
     }
 
-    public static function workingDir()
+    public static function workingDir(): string
     {
         return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'json-api-behat';
     }
 
-    private static function clearDirectory($path)
+    private static function clearDirectory(string $path): void
     {
         $files = scandir($path);
         array_shift($files);

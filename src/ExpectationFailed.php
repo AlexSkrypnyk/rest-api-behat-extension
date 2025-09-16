@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension;
 
 abstract class ExpectationFailed extends \Exception
@@ -8,15 +10,13 @@ abstract class ExpectationFailed extends \Exception
 
     /**
      * Returns exception message with additional context info.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             $contextText = $this->pipeString($this->trimString($this->getContextText())."\n");
             $string = sprintf("%s\n\n%s", $this->getMessage(), $contextText);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             return $this->getMessage();
         }
 

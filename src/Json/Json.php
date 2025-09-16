@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -13,7 +15,7 @@ class Json
         $this->content = true === $encodedAsString ? $this->decode((string) $content) : $content;
     }
 
-    public static function fromRawContent($content)
+    public static function fromRawContent($content): static
     {
         return new static($content, false);
     }
@@ -48,12 +50,12 @@ class Json
         return json_encode($this->content);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->encode(false);
     }
 
-    private function decode($content)
+    private function decode(string $content)
     {
         $result = json_decode($content);
 

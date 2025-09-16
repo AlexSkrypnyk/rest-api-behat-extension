@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Json;
 
+use Ubirak\RestApiBehatExtension\Json\Json;
+use mock\JsonSchema\Validator;
+use mock\JsonSchema\SchemaStorage;
 use atoum;
 use Ubirak\RestApiBehatExtension\Json\JsonSchema as SUT;
 
 class JsonSchema extends atoum
 {
-    public function test_should_validate_correct_json()
+    public function testShouldValidateCorrectJson(): void
     {
         $this
             ->given(
                 $sut = new SUT('schema.json'),
-                $json = new \Ubirak\RestApiBehatExtension\Json\Json('{"foo":"bar"}'),
-                $validator = new \mock\JsonSchema\Validator(),
+                $json = new Json('{"foo":"bar"}'),
+                $validator = new Validator(),
                 $validator->getMockController()->check = true,
                 $this->mockGenerator->orphanize('__construct'),
-                $schemaStorage = new \mock\JsonSchema\SchemaStorage(),
+                $schemaStorage = new SchemaStorage(),
                 $schemaStorage->getMockController()->resolveRef = 'mySchema'
             )
             ->when(
@@ -32,23 +37,23 @@ class JsonSchema extends atoum
         ;
     }
 
-    public function test_should_throw_exception_for_incorrect_json()
+    public function testShouldThrowExceptionForIncorrectJson(): void
     {
         $this
             ->given(
                 $sut = new SUT('schema.json'),
-                $json = new \Ubirak\RestApiBehatExtension\Json\Json('{}'),
-                $validator = new \mock\JsonSchema\Validator(),
+                $json = new Json('{}'),
+                $validator = new Validator(),
                 $validator->getMockController()->check = false,
                 $validator->getMockController()->getErrors = [
                     ['property' => 'foo', 'message' => 'invalid'],
                     ['property' => 'bar', 'message' => 'not found'],
                 ],
                 $this->mockGenerator->orphanize('__construct'),
-                $schemaStorage = new \mock\JsonSchema\SchemaStorage(),
+                $schemaStorage = new SchemaStorage(),
                 $schemaStorage->getMockController()->resolveRef = 'mySchema'
             )
-            ->exception(function () use ($sut, $json, $validator, $schemaStorage) {
+            ->exception(function () use ($sut, $json, $validator, $schemaStorage): void {
                 $sut->validate($json, $validator, $schemaStorage);
             })
                 ->hasMessage(

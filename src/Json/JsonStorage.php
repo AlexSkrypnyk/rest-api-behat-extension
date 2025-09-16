@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 use Ubirak\RestApiBehatExtension\Rest\ResponseStorage;
@@ -11,15 +13,18 @@ class JsonStorage implements ResponseStorage
 {
     private $rawContent;
 
-    public function writeRawContent($rawContent)
+    public function writeRawContent($rawContent): void
     {
         $this->rawContent = $rawContent;
     }
 
-    public function readJson()
+    public function readJson(): Json
     {
         if ($this->rawContent === null) {
-            throw new \LogicException('No content defined. You should use JsonStorage::writeRawContent method to inject content you want to analyze');
+            throw new \LogicException(
+                'No content defined. You should use JsonStorage::writeRawContent method ' .
+                'to inject content you want to analyze'
+            );
         }
 
         return new Json($this->rawContent);

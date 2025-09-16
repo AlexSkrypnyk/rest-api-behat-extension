@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Simple test server for Behat tests - replaced Silex with plain PHP routing.
  */
@@ -25,10 +27,8 @@ switch ($path) {
 
         // Forms should be read from request, other data straight from input.
         $requestData = $request->request->all();
-        if (!empty($requestData)) {
-            foreach ($requestData as $key => $value) {
-                $ret[$key] = $value;
-            }
+        foreach ($requestData as $key => $value) {
+            $ret[$key] = $value;
         }
 
         /** @var string $content */

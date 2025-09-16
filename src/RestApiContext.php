@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension;
 
+use atoum\atoum\asserter\generator;
+use Ubirak\RestApiBehatExtension\Rest\WrongResponseExpectation;
+use Ubirak\RestApiBehatExtension\Rest\HttpExchangeFormatter;
 use atoum\atoum\asserter;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
@@ -12,14 +17,14 @@ use Behat\Gherkin\Node\TableNode;
 
 class RestApiContext implements Context, SnippetAcceptingContext
 {
-    private $asserter;
+    private generator $asserter;
 
-    private $restApiBrowser;
+    private RestApiBrowser $restApiBrowser;
 
     public function __construct(RestApiBrowser $restApiBrowser)
     {
         $this->restApiBrowser = $restApiBrowser;
-        $this->asserter = new asserter\generator();
+        $this->asserter = new generator();
     }
 
     /**
@@ -28,7 +33,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
      *
      * @When /^(?:I )?send a ([A-Z]+) request to "([^"]+)"$/
      */
-    public function iSendARequest($method, $url)
+    public function iSendARequest(string $method, $url): void
     {
         $this->restApiBrowser->sendRequest($method, $url);
     }
@@ -38,11 +43,10 @@ class RestApiContext implements Context, SnippetAcceptingContext
      *
      * @param string       $method request method
      * @param string       $url    relative url
-     * @param PyStringNode $body
      *
      * @When /^(?:I )?send a ([A-Z]+) request to "([^"]+)" with body:$/
      */
-    public function iSendARequestWithBody($method, $url, PyStringNode $body)
+    public function iSendARequestWithBody(string $method, $url, PyStringNode $body): void
     {
         $this->restApiBrowser->sendRequest($method, $url, (string) $body);
     }
@@ -50,11 +54,10 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @When I send a POST request to :url as HTML form with body:
      */
-    public function iSendAPostRequestToAsHtmlFormWithBody($url, TableNode $body)
+    public function iSendAPostRequestToAsHtmlFormWithBody($url, TableNode $body): void
     {
         $formElements = [];
         foreach ($body as $element) {
-
             if (!isset($element['object'])) {
                 throw new \Exception('You have to specify an object attribute');
             }
@@ -70,14 +73,19 @@ class RestApiContext implements Context, SnippetAcceptingContext
      *
      * @Then /^(?:the )rest ?response status code should be (\d+)$/
      */
-    public function theResponseCodeShouldBe($code)
+    public function theResponseCodeShouldBe($code): void
     {
         $expected = intval($code);
         $actual = intval($this->getResponse()->getStatusCode());
         try {
             $this->asserter->variable($actual)->isEqualTo($expected);
-        } catch (\Exception $e) {
-            throw new Rest\WrongResponseExpectation($e->getMessage(), $this->restApiBrowser->getRequest(), $this->getResponse(), $e);
+        } catch (\Exception $exception) {
+            throw new WrongResponseExpectation(
+                $exception->getMessage(),
+                $this->restApiBrowser->getRequest(),
+                $this->getResponse(),
+                $exception
+            );
         }
     }
 
@@ -92,7 +100,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @Given /^I set "([^"]*)" header equal to "([^"]*)"$/
      */
-    public function iSetHeaderEqualTo($headerName, $headerValue)
+    public function iSetHeaderEqualTo($headerName, string $headerValue): void
     {
         $this->restApiBrowser->setRequestHeader($headerName, $headerValue);
     }
@@ -100,7 +108,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @Given /^I add "([^"]*)" header equal to "([^"]*)"$/
      */
-    public function iAddHeaderEqualTo($headerName, $headerValue)
+    public function iAddHeaderEqualTo($headerName, string $headerValue): void
     {
         $this->restApiBrowser->addRequestHeader($headerName, $headerValue);
     }
@@ -110,7 +118,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
      *
      * @When /^I set basic authentication with "(?P<username>[^"]*)" and "(?P<password>[^"]*)"$/
      */
-    public function iSetBasicAuthenticationWithAnd($username, $password)
+    public function iSetBasicAuthenticationWithAnd(string $username, string $password): void
     {
         $authorization = base64_encode($username.':'.$password);
         $this->restApiBrowser->setRequestHeader('Authorization', 'Basic '.$authorization);
@@ -119,7 +127,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @Then print request and response
      */
-    public function printRequestAndResponse()
+    public function printRequestAndResponse(): void
     {
         $formatter = $this->buildHttpExchangeFormatter();
         echo "REQUEST:\n";
@@ -131,7 +139,7 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @Then print request
      */
-    public function printRequest()
+    public function printRequest(): void
     {
         echo $this->buildHttpExchangeFormatter()->formatRequest();
     }
@@ -139,13 +147,13 @@ class RestApiContext implements Context, SnippetAcceptingContext
     /**
      * @Then print response
      */
-    public function printResponse()
+    public function printResponse(): void
     {
         echo $this->buildHttpExchangeFormatter()->formatFullExchange();
     }
 
-    private function buildHttpExchangeFormatter()
+    private function buildHttpExchangeFormatter(): HttpExchangeFormatter
     {
-        return new Rest\HttpExchangeFormatter($this->restApiBrowser->getRequest(), $this->getResponse());
+        return new HttpExchangeFormatter($this->restApiBrowser->getRequest(), $this->getResponse());
     }
 }

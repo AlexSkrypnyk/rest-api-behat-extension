@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension;
 
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
@@ -12,7 +14,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class Extension implements ExtensionInterface
 {
-    public function load(ContainerBuilder $container, array $config)
+    public function load(ContainerBuilder $container, array $config): void
     {
         $container->setParameter('ubirak.json_api.rest.base_url', $config['rest']['base_url']);
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/Resources'));
@@ -20,11 +22,14 @@ class Extension implements ExtensionInterface
 
         if (true === $config['rest']['store_response']) {
             $definitionRestApiBrowser = $container->findDefinition('ubirak.json_api.rest.rest_api_browser');
-            $definitionRestApiBrowser->addMethodCall('enableResponseStorage', [new Reference('ubirak.json_api.json.json_storage')]);
+            $definitionRestApiBrowser->addMethodCall(
+                'enableResponseStorage',
+                [new Reference('ubirak.json_api.json.json_storage')]
+            );
         }
     }
 
-    public function configure(ArrayNodeDefinition $builder)
+    public function configure(ArrayNodeDefinition $builder): void
     {
         $builder
             ->addDefaultsIfNotSet()

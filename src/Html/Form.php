@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Html;
+
+use GuzzleHttp\Psr7\MultipartStream;
 
 class Form
 {
-    private $body = [];
+    private array $body;
 
-    private $contentTypeHeaderValue = '';
+    private string $contentTypeHeaderValue = '';
 
     public function __construct(array $body)
     {
         $this->body = $body;
     }
 
-    public function getBody()
+    public function getBody(): MultipartStream|string
     {
         if ($this->bodyHasFileObject()) {
             return $this->getMultipartStreamBody();
@@ -22,29 +26,17 @@ class Form
         return $this->getNameValuePairBody();
     }
 
-    /**
-     *
-     * @return string
-     */
-    public function getContentTypeHeaderValue()
+    public function getContentTypeHeaderValue(): string
     {
         return $this->contentTypeHeaderValue;
     }
 
-    /**
-     *
-     * @param string $value
-     */
-    private function setContentTypeHeaderValue($value)
+    private function setContentTypeHeaderValue(string $value): void
     {
         $this->contentTypeHeaderValue = $value;
     }
 
-    /**
-     *
-     * @return boolean
-     */
-    private function bodyHasFileObject()
+    private function bodyHasFileObject(): bool
     {
         foreach ($this->body as $element) {
             if ($element['object'] == 'file') {
@@ -55,35 +47,28 @@ class Form
         return false;
     }
 
-    /**
-     *
-     * @return \GuzzleHttp\Psr7\MultipartStream
-     */
-    private function getMultipartStreamBody()
+    private function getMultipartStreamBody(): MultipartStream
     {
         $multiparts = array_map(
-                function ($element) {
+            function (array $element): array {
 
-            if ($element['object'] == 'file') {
-                return ['name' => $element['name'], 'contents' => fopen($element['value'], 'r')];
-            }
+                if ($element['object'] == 'file') {
+                    return ['name' => $element['name'], 'contents' => fopen($element['value'], 'r')];
+                }
 
-            return ['name' => $element['name'], 'contents' => $element['value']];
-        }, $this->body
+                return ['name' => $element['name'], 'contents' => $element['value']];
+            },
+            $this->body
         );
 
         $boundary = sha1(uniqid('', true));
 
         $this->setContentTypeHeaderValue('multipart/form-data; boundary=' . $boundary);
 
-        return new \GuzzleHttp\Psr7\MultipartStream($multiparts, $boundary);
+        return new MultipartStream($multiparts, $boundary);
     }
 
-    /**
-     *
-     * @return string
-     */
-    private function getNameValuePairBody()
+    private function getNameValuePairBody(): string
     {
         $body = [];
         foreach ($this->body as $element) {
@@ -94,5 +79,4 @@ class Form
 
         return http_build_query($body);
     }
-
 }

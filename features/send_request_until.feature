@@ -20,7 +20,7 @@ Feature: Send request until
 
     Scenario: Send request until it works
         Given a file named "features/send_request_until.feature" with:
-            """
+        """
             Feature: Send request until
                 In order to deal with async system
                 As a feature runner
@@ -31,9 +31,9 @@ Feature: Send request until
                     And I call my microservice
                     And I call my microservice
                     Then print response
-            """
+        """
         And a file named "features/bootstrap/FeatureContext.php" with:
-            """
+        """
             <?php
             use Behat\Behat\Context\Context;
             use Ubirak\RestApiBehatExtension\Rest\RestApiBrowser;
@@ -65,16 +65,16 @@ Feature: Send request until
                     );
                 }
             }
-            """
+        """
         When I run behat "features/send_request_until.feature"
         Then it should pass with:
-            """
-            200 OK
-            """
+        """
+        │ 200 OK
+        """
 
     Scenario: Send request that will fail always
         Given a file named "features/send_request_until.feature" with:
-            """
+        """
             Feature: Send request until
                 In order to deal with async system
                 As a feature runner
@@ -83,9 +83,9 @@ Feature: Send request until
                 Scenario: Send request that fail
                     When I call my microservice
                     Then print response
-            """
+        """
         And a file named "features/bootstrap/FeatureContext.php" with:
-            """
+        """
             <?php
             use Behat\Behat\Context\Context;
             use Ubirak\RestApiBehatExtension\Rest\RestApiBrowser;
@@ -118,9 +118,9 @@ Feature: Send request until
                     );
                 }
             }
-            """
+        """
         When I run behat "features/send_request_until.feature"
         Then it should fail with:
-            """
+        """
             integer(502) is not equal to integer(200)
-            """
+        """

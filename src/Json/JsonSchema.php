@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ubirak\RestApiBehatExtension\Json;
 
 use JsonSchema\SchemaStorage;
@@ -17,7 +19,7 @@ class JsonSchema
         $this->filename = $filename;
     }
 
-    public function validate(Json $json, Validator $validator, SchemaStorage $schemaStorage)
+    public function validate(Json $json, Validator $validator, SchemaStorage $schemaStorage): bool
     {
         $schema = $schemaStorage->resolveRef('file://'.realpath($this->filename));
         $data = $json->getRawContent();
