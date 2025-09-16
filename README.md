@@ -1,12 +1,59 @@
 # RestApiExtension for Behat
-* [Branch behat2](https://github.com/ubirak/rest-api-behat-extension/tree/behat-2.x) : **Behat 2.x**
-* [Branch master](https://github.com/ubirak/rest-api-behat-extension/tree/master) : **Behat 3.x**
 
-[![Build Status](https://travis-ci.org/ubirak/rest-api-behat-extension.png?branch=master)](https://travis-ci.org/ubirak/rest-api-behat-extension)
+## About this fork
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ubirak/rest-api-behat-extension/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ubirak/rest-api-behat-extension/?branch=master)
+[![tests](https://github.com/AlexSkrypnyk/rest-api-behat-extension/actions/workflows/test-php.yml/badge.svg)](https://github.com/AlexSkrypnyk/rest-api-behat-extension/actions/workflows/test-php.yml)
+![GitHub release](https://img.shields.io/github/v/release/AlexSkrypnyk/rest-api-behat-extension?logo=github)
+![LICENSE](https://img.shields.io/github/license/AlexSkrypnyk/rest-api-behat-extension)
 
-For now only JSON api is supported to analyze response, but you could use REST part to perform request on any type of api.
+This is a fork of the original `ubirak/rest-api-behat-extension` package, 
+modified to support modern PHP versions and to introduce Drupal-compatible
+step definitions.
+
+I pledge to maintain this fork and keep it up to date with the latest changes
+from the original repository.
+
+### Installation
+
+Installed via Composer:
+
+Add the following to your `composer.json` file under the `repositories` section:
+
+```json
+{
+    "type": "vcs",
+    "url": "https://github.com/AlexSkrypnyk/rest-api-behat-extension.git",
+    "canonical": true
+}
+```
+Then run:
+
+```bash
+composer require --dev ubirak/rest-api-behat-extension
+```
+
+### Versioning Policy
+
+This fork follows the upstream project closely while providing additional
+patches. To ensure compatibility with Composer and standard Semantic
+Versioning (SemVer), releases in this fork are always published under the same
+major and minor versions as upstream, with only the patch number incremented.
+
+For example, if upstream’s latest release is `v9.1.0` and this fork introduces
+extra fixes before upstream publishes a new version, the fork will tag its
+release as `v9.1.1`. If upstream later publishes `v9.1.1`, the fork will move
+forward and release `v9.1.2`. This way, patch numbers always increase
+sequentially, avoiding conflicts with upstream tags and guaranteeing a clear
+upgrade path.
+
+Consumers requiring this fork simply add it as a VCS repository and keep using
+the upstream package name. Composer will then resolve dependencies to the fork,
+and applications using a constraint such as `^9.1` will transparently receive
+the patched releases without needing to change version requirements.
+
+---
+
+For now only JSON API is supported to analyze response, but you could use REST part to perform request on any type of API.
 
 ## Warning
 

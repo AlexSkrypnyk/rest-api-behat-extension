@@ -15,11 +15,13 @@ class WrongResponseExpectation extends atoum
                 $request = new \mock\Psr\Http\Message\RequestInterface(),
                 $this->calling($request)->getMethod = 'GET',
                 $this->calling($request)->getUri = $uri,
+                $stream = new \mock\Psr\Http\Message\StreamInterface(),
+                $this->calling($stream)->__toString = '{"status":"ok"}',
                 $response = new \mock\Psr\Http\Message\ResponseInterface(),
                 $this->calling($response)->getStatusCode = 200,
                 $this->calling($response)->getReasonPhrase = 'OK',
                 $this->calling($response)->getHeaders = ['Content-Type' => 'application/json'],
-                $this->calling($response)->getBody = '{"status":"ok"}',
+                $this->calling($response)->getBody = $stream,
                 $this->newTestedInstance('Error', $request, $response)
             )
             ->when(

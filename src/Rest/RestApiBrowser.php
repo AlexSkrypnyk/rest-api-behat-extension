@@ -2,10 +2,11 @@
 
 namespace Ubirak\RestApiBehatExtension\Rest;
 
-use Http\Discovery\Psr17Factory;
+use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tolerance\Operation\Callback;
@@ -35,7 +36,10 @@ class RestApiBrowser
     private $host;
 
     /** @var RequestFactoryInterface */
-    private $messageFactory;
+    private $requestFactory;
+
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
 
     /**
      * @param string $host
@@ -44,7 +48,8 @@ class RestApiBrowser
     {
         $this->host = $host;
         $this->httpClient = $httpClient ?: Psr18ClientDiscovery::find();
-        $this->messageFactory = new Psr17Factory();
+        $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
     }
 
     /**
@@ -106,12 +111,12 @@ class RestApiBrowser
             $this->setRequestHeader('Content-Type', $html->getContentTypeHeaderValue());
         }
 
-        $this->request = $this->messageFactory->createRequest($method, $uri);
+        $this->request = $this->requestFactory->createRequest($method, $uri);
         foreach ($this->requestHeaders as $keyHeader => $valueHeader) {
             $this->request = $this->request->withHeader($keyHeader, $valueHeader);
         }
         if (null !== $body) {
-            $this->request = $this->request->withBody($this->messageFactory->createStream($body));
+            $this->request = $this->request->withBody($this->streamFactory->createStream($body));
         }
 
         $this->response = $this->httpClient->sendRequest($this->request);
