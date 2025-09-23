@@ -13,7 +13,7 @@ class HttpExchangeFormatter
 
     private ?ResponseInterface $response;
 
-    public function __construct(RequestInterface $request = null, ResponseInterface $response = null)
+    public function __construct(?RequestInterface $request = null, ?ResponseInterface $response = null)
     {
         $this->request = $request;
         $this->response = $response;
