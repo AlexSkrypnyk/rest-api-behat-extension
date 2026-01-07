@@ -19,11 +19,8 @@ class RestApiContext implements Context, SnippetAcceptingContext
 {
     protected generator $asserter;
 
-    protected RestApiBrowser $restApiBrowser;
-
-    public function __construct(RestApiBrowser $restApiBrowser)
+    public function __construct(protected RestApiBrowser $restApiBrowser)
     {
-        $this->restApiBrowser = $restApiBrowser;
         $this->asserter = new generator();
     }
 
@@ -46,18 +43,18 @@ class RestApiContext implements Context, SnippetAcceptingContext
      *
      * @When /^(?:I )?send a ([A-Z]+) request to "([^"]+)" with body:$/
      */
-    public function iSendARequestWithBody(string $method, $url, PyStringNode $body): void
+    public function iSendARequestWithBody(string $method, $url, PyStringNode $pyStringNode): void
     {
-        $this->restApiBrowser->sendRequest($method, $url, (string) $body);
+        $this->restApiBrowser->sendRequest($method, $url, (string) $pyStringNode);
     }
 
     /**
      * @When I send a POST request to :url as HTML form with body:
      */
-    public function iSendAPostRequestToAsHtmlFormWithBody($url, TableNode $body): void
+    public function iSendAPostRequestToAsHtmlFormWithBody($url, TableNode $tableNode): void
     {
         $formElements = [];
-        foreach ($body as $element) {
+        foreach ($tableNode as $element) {
             if (!isset($element['object'])) {
                 throw new \Exception('You have to specify an object attribute');
             }

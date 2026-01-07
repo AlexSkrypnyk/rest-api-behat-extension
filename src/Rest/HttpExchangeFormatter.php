@@ -9,14 +9,10 @@ use Psr\Http\Message\RequestInterface;
 
 class HttpExchangeFormatter
 {
-    private ?RequestInterface $request;
-
-    private ?ResponseInterface $response;
-
-    public function __construct(?RequestInterface $request = null, ?ResponseInterface $response = null)
-    {
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct(
+        private readonly ?RequestInterface $request = null,
+        private readonly ?ResponseInterface $response = null,
+    ) {
     }
 
     public function formatRequest(): string

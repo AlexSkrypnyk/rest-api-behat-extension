@@ -16,7 +16,7 @@ abstract class ExpectationFailed extends \Exception
         try {
             $contextText = $this->pipeString($this->trimString($this->getContextText())."\n");
             $string = sprintf("%s\n\n%s", $this->getMessage(), $contextText);
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return $this->getMessage();
         }
 

@@ -6,7 +6,7 @@ namespace Ubirak\RestApiBehatExtension\Json;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class Json
+class Json implements \Stringable
 {
     private $content;
 
@@ -20,20 +20,20 @@ class Json
         return new static($content, false);
     }
 
-    public function read($expression, PropertyAccessor $accessor)
+    public function read($expression, PropertyAccessor $propertyAccessor)
     {
         if (is_array($this->content)) {
-            $expression = preg_replace('/^root/', '', $expression);
+            $expression = preg_replace('/^root/', '', (string) $expression);
         } else {
-            $expression = preg_replace('/^root./', '', $expression);
+            $expression = preg_replace('/^root./', '', (string) $expression);
         }
 
         // If root asked, we return the entire content
-        if (strlen(trim($expression)) <= 0) {
+        if (strlen(trim((string) $expression)) <= 0) {
             return $this->content;
         }
 
-        return $accessor->getValue($this->content, $expression);
+        return $propertyAccessor->getValue($this->content, $expression);
     }
 
     public function getRawContent()
@@ -52,7 +52,7 @@ class Json
 
     public function __toString(): string
     {
-        return $this->encode(false);
+        return (string) $this->encode(false);
     }
 
     private function decode(string $content)

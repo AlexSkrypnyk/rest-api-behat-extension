@@ -8,11 +8,8 @@ use Behat\Behat\Context\Argument\ArgumentResolver;
 
 class JsonInspectorResolver implements ArgumentResolver
 {
-    private JsonInspector $jsonInspector;
-
-    public function __construct(JsonInspector $jsonInspector)
+    public function __construct(private readonly JsonInspector $jsonInspector)
     {
-        $this->jsonInspector = $jsonInspector;
     }
 
     public function resolveArguments(\ReflectionClass $classReflection, array $arguments)

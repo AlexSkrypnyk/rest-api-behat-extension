@@ -10,14 +10,12 @@ use Psr\Http\Message\RequestInterface;
 
 class WrongResponseExpectation extends ExpectationFailed
 {
-    private RequestInterface $request;
-
-    private ResponseInterface $response;
-
-    public function __construct($message, RequestInterface $request, ResponseInterface $response, $previous = null)
-    {
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct(
+        $message,
+        private readonly RequestInterface $request,
+        private readonly ResponseInterface $response,
+        $previous = null,
+    ) {
         parent::__construct($message, 0, $previous);
     }
 
