@@ -8,11 +8,8 @@ use Ubirak\RestApiBehatExtension\ExpectationFailed;
 
 class WrongJsonExpectation extends ExpectationFailed
 {
-    private Json $json;
-
-    public function __construct($message, Json $json, $previous = null)
+    public function __construct($message, private readonly Json $json, $previous = null)
     {
-        $this->json = $json;
         parent::__construct($message, 0, $previous);
     }
 

@@ -8,11 +8,8 @@ use Behat\Behat\Context\Argument\ArgumentResolver;
 
 class RestApiBrowserResolver implements ArgumentResolver
 {
-    private RestApiBrowser $restApiBrowser;
-
-    public function __construct(RestApiBrowser $restApiBrowser)
+    public function __construct(private readonly RestApiBrowser $restApiBrowser)
     {
-        $this->restApiBrowser = $restApiBrowser;
     }
 
     public function resolveArguments(\ReflectionClass $classReflection, array $arguments)

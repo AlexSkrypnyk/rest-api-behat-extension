@@ -9,14 +9,11 @@ use JsonSchema\Validator;
 
 class JsonSchema
 {
-    private $filename;
-
     /**
      * @param string $filename
      */
-    public function __construct($filename)
+    public function __construct(private $filename)
     {
-        $this->filename = $filename;
     }
 
     public function validate(Json $json, Validator $validator, SchemaStorage $schemaStorage): bool

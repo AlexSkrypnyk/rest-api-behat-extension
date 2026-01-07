@@ -32,7 +32,7 @@ class Json extends atoum
                     new SUT('{"foo": "bar"}')
                 )
             ;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             $hasException = true;
         }
 

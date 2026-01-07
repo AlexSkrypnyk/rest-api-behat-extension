@@ -24,11 +24,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
     private ?string $workingDir = null;
 
-    private generator $asserter;
+    private readonly generator $generator;
 
     public function __construct()
     {
-        $this->asserter = new generator();
+        $this->generator = new generator();
     }
 
     /**
@@ -49,7 +49,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function prepareScenario(): void
     {
-        $dir = self::workingDir() . DIRECTORY_SEPARATOR . (md5((string)(microtime(true) * rand(0, 10000))));
+        $dir = self::workingDir() . DIRECTORY_SEPARATOR . (md5((string)(microtime(true) * random_int(0, 10000))));
         mkdir($dir . '/features/bootstrap', 0777, true);
 
         $phpFinder = new PhpExecutableFinder();
@@ -65,9 +65,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given /^a file named "(?P<filename>[^"]*)" with:$/
      */
-    public function aFileNamedWith(string $filename, PyStringNode $fileContent): void
+    public function aFileNamedWith(string $filename, PyStringNode $pyStringNode): void
     {
-        $content = strtr((string) $fileContent, array("'''" => '"""'));
+        $content = strtr((string) $pyStringNode, ["'''" => '"""']);
         $this->createFile($this->workingDir . '/' . $filename, $content);
     }
 
@@ -76,7 +76,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iRunBehat($arguments): void
     {
-        $argumentsString = strtr($arguments, array("'" => '"'));
+        $argumentsString = strtr($arguments, ["'" => '"']);
 
         $commandLine = sprintf(
             '%s %s %s %s',
@@ -95,18 +95,18 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^it should (fail|pass) with:$/
      */
-    public function itShouldTerminateWithStatusAndContent($exitStatus, PyStringNode $string): void
+    public function itShouldTerminateWithStatusAndContent($exitStatus, PyStringNode $pyStringNode): void
     {
         if ('fail' === $exitStatus) {
-            $this->asserter->integer($this->getExitCode())->isEqualTo(1);
+            $this->generator->integer($this->getExitCode())->isEqualTo(1);
         } elseif ('pass' === $exitStatus) {
-            $this->asserter->integer($this->getExitCode())->isEqualTo(0);
+            $this->generator->integer($this->getExitCode())->isEqualTo(0);
         } else {
             throw new \LogicException('Accepts only "fail" or "pass"');
         }
 
         $stringAsserterFunc = class_exists('mageekguy\\atoum\\asserters\\phpString') ? 'phpString' : 'string';
-        $this->asserter->$stringAsserterFunc($this->getOutput())->contains((string) $string);
+        $this->generator->$stringAsserterFunc($this->getOutput())->contains((string) $pyStringNode);
     }
 
     private function getExitCode(): ?int
@@ -123,7 +123,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $output = str_replace(PHP_EOL, "\n", $output);
         }
 
-        return trim(preg_replace("/ +$/m", '', $output));
+        return trim((string) preg_replace("/ +$/m", '', $output));
     }
 
     private function createFile(string $filename, string $content): void

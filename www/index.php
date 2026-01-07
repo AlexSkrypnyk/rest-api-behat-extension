@@ -19,9 +19,9 @@ header('Content-Type: application/json');
 
 switch ($path) {
     case 'echo':
-        $ret = array(
+        $ret = [
             'warning' => 'Do not expose this service in production : it is intrinsically unsafe',
-        );
+        ];
 
         $ret['method'] = $request->getMethod();
 
@@ -44,7 +44,7 @@ switch ($path) {
             }
         }
 
-        $ret['headers'] = array();
+        $ret['headers'] = [];
         foreach ($request->headers->all() as $k => $v) {
             $ret['headers'][$k] = $v;
         }

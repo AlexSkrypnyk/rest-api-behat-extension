@@ -13,13 +13,10 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class JsonParser
 {
-    private $evaluationMode;
+    private readonly PropertyAccessorInterface $propertyAccessor;
 
-    private PropertyAccessorInterface $propertyAccessor;
-
-    public function __construct($evaluationMode)
+    public function __construct(private $evaluationMode)
     {
-        $this->evaluationMode = $evaluationMode;
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor()
@@ -39,8 +36,8 @@ class JsonParser
         }
     }
 
-    public function validate(Json $json, JsonSchema $schema): bool
+    public function validate(Json $json, JsonSchema $jsonSchema): bool
     {
-        return $schema->validate($json, new Validator(), new SchemaStorage(new UriRetriever(), new UriResolver()));
+        return $jsonSchema->validate($json, new Validator(), new SchemaStorage(new UriRetriever(), new UriResolver()));
     }
 }

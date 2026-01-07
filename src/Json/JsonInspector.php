@@ -6,17 +6,11 @@ namespace Ubirak\RestApiBehatExtension\Json;
 
 class JsonInspector
 {
-    private JsonParser $jsonParser;
-
-    private JsonStorage $jsonStorage;
-
-    private JsonSearcher $jsonSearcher;
-
-    public function __construct(JsonStorage $jsonStorage, JsonParser $jsonParser, JsonSearcher $jsonSearcher)
-    {
-        $this->jsonParser = $jsonParser;
-        $this->jsonStorage = $jsonStorage;
-        $this->jsonSearcher = $jsonSearcher;
+    public function __construct(
+        private readonly JsonStorage $jsonStorage,
+        private readonly JsonParser $jsonParser,
+        private readonly JsonSearcher $jsonSearcher,
+    ) {
     }
 
     public function readJsonNodeValue($jsonNodeExpression)

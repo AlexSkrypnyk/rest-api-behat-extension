@@ -8,13 +8,10 @@ use GuzzleHttp\Psr7\MultipartStream;
 
 class Form
 {
-    private array $body;
-
     private string $contentTypeHeaderValue = '';
 
-    public function __construct(array $body)
+    public function __construct(private readonly array $body)
     {
-        $this->body = $body;
     }
 
     public function getBody(): MultipartStream|string

@@ -29,8 +29,8 @@ class RestApiBrowser extends atoum
             ->and($sut = new SUT('http://verylastroom.com', $httpClient))
         ;
 
-        foreach ($addHeadersSteps as $addHeadersStep) {
-            foreach ($addHeadersStep as $headerName => $headerValue) {
+        foreach ($addHeadersSteps as $addHeaderStep) {
+            foreach ($addHeaderStep as $headerName => $headerValue) {
                 $sut->addRequestHeader($headerName, $headerValue);
             }
         }
@@ -63,8 +63,8 @@ class RestApiBrowser extends atoum
             ->and($sut = new SUT('http://verylastroom.com', $httpClient))
         ;
 
-        foreach ($setHeadersSteps as $addHeadersStep) {
-            foreach ($addHeadersStep as $headerName => $headerValue) {
+        foreach ($setHeadersSteps as $setHeaderStep) {
+            foreach ($setHeaderStep as $headerName => $headerValue) {
                 $this->and($sut->setRequestHeader($headerName, $headerValue));
             }
         }

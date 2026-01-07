@@ -11,15 +11,12 @@ use Behat\Gherkin\Node\PyStringNode;
 
 class JsonContext implements Context, SnippetAcceptingContext
 {
-    protected JsonInspector $jsonInspector;
-
     protected asserter $asserter;
 
     protected ?string $jsonSchemaBaseUrl = null;
 
-    public function __construct(JsonInspector $jsonInspector, $jsonSchemaBaseUrl = null)
+    public function __construct(protected JsonInspector $jsonInspector, $jsonSchemaBaseUrl = null)
     {
-        $this->jsonInspector = $jsonInspector;
         $this->asserter = new asserter();
 
         if (null !== $jsonSchemaBaseUrl) {
@@ -31,9 +28,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @When /^I load JSON:$/
      */
-    public function iLoadJson(PyStringNode $jsonContent): void
+    public function iLoadJson(PyStringNode $pyStringNode): void
     {
-        $this->jsonInspector->writeJson((string) $jsonContent);
+        $this->jsonInspector->writeJson((string) $pyStringNode);
     }
 
     /**
@@ -119,7 +116,7 @@ class JsonContext implements Context, SnippetAcceptingContext
      *
      * @Given /^the JSON node "(?P<jsonNode>[^"]*)" should exist$/
      */
-    public function theJsonNodeShouldExist($jsonNode): void
+    public function theJsonNodeShouldExist(string $jsonNode): void
     {
         try {
             $this->evaluateJsonNodeValue($jsonNode);
@@ -137,7 +134,7 @@ class JsonContext implements Context, SnippetAcceptingContext
      *
      * @Given /^the JSON node "(?P<jsonNode>[^"]*)" should not exist$/
      */
-    public function theJsonNodeShouldNotExist($jsonNode): void
+    public function theJsonNodeShouldNotExist(string $jsonNode): void
     {
         try {
             $realValue = $this->evaluateJsonNodeValue($jsonNode);
@@ -149,7 +146,7 @@ class JsonContext implements Context, SnippetAcceptingContext
         } catch (WrongJsonExpectation $exception) {
             // Re-throw WrongJsonExpectation as it contains our desired error message
             throw $exception;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // If the node does not exist an exception should be thrown - this is expected behavior
         }
     }
@@ -157,10 +154,10 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON should be valid according to this schema:$/
      */
-    public function theJsonShouldBeValidAccordingToThisSchema(PyStringNode $jsonSchemaContent): void
+    public function theJsonShouldBeValidAccordingToThisSchema(PyStringNode $pyStringNode): void
     {
         $tempFilename = tempnam(sys_get_temp_dir(), 'rae');
-        file_put_contents($tempFilename, $jsonSchemaContent);
+        file_put_contents($tempFilename, $pyStringNode);
         $this->assert(function () use ($tempFilename): void {
             $this->jsonInspector->validateJson(
                 new JsonSchema($tempFilename)
@@ -186,12 +183,12 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then /^the JSON should be equal to:$/
      */
-    public function theJsonShouldBeEqualTo(PyStringNode $jsonContent): void
+    public function theJsonShouldBeEqualTo(PyStringNode $pyStringNode): void
     {
         $realJsonValue = $this->readJson();
 
         try {
-            $expectedJsonValue = new Json($jsonContent);
+            $expectedJsonValue = new Json($pyStringNode);
         } catch (\Exception $exception) {
             throw new \Exception('The expected JSON is not a valid', $exception->getCode(), $exception);
         }
@@ -215,9 +212,9 @@ class JsonContext implements Context, SnippetAcceptingContext
     /**
      * @Then the JSON path expression :pathExpression should be equal to:
      */
-    public function theJsonExpressionShouldBeEqualTo($pathExpression, PyStringNode $expectedJson): void
+    public function theJsonExpressionShouldBeEqualTo($pathExpression, PyStringNode $pyStringNode): void
     {
-        $this->theJsonPathExpressionShouldBeEqualToJson($pathExpression, (string) $expectedJson);
+        $this->theJsonPathExpressionShouldBeEqualToJson($pathExpression, (string) $pyStringNode);
     }
 
     /**
@@ -250,7 +247,7 @@ class JsonContext implements Context, SnippetAcceptingContext
 
     protected function evaluateExpectedValue($expectedValue)
     {
-        if (in_array($expectedValue, array('true', 'false'))) {
+        if (in_array($expectedValue, ['true', 'false'])) {
             return filter_var($expectedValue, FILTER_VALIDATE_BOOLEAN);
         }
 
