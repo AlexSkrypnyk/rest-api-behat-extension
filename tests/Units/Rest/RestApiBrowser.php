@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ubirak\RestApiBehatExtension\Tests\Units\Rest;
 
 use Http\Mock\Client;
-use Http\Message\MessageFactory\GuzzleMessageFactory;
+use GuzzleHttp\Psr7\HttpFactory;
 use atoum;
 use Ubirak\RestApiBehatExtension\Rest\RestApiBrowser as SUT;
 
@@ -171,21 +171,18 @@ class RestApiBrowser extends atoum
 
     /**
      * @param string $baseUrl
-     * @param int    $responseStatusCode
      *
      * @return \Ivory\HttpAdapter\HttpAdapterInterface
      */
-    private function mockHttpClient($responseStatusCode, array $headers = []): Client
+    private function mockHttpClient(int $responseStatusCode, array $headers = []): Client
     {
         $mockHttpClient = new Client();
-        $messageFactory = new GuzzleMessageFactory();
-        $mockHttpClient->addResponse(
-            $messageFactory->createResponse(
-                $responseStatusCode,
-                null,
-                $headers
-            )
-        );
+        $response_factory = new HttpFactory();
+        $response = $response_factory->createResponse($responseStatusCode);
+        foreach ($headers as $name => $value) {
+            $response = $response->withHeader($name, $value);
+        }
+        $mockHttpClient->addResponse($response);
 
         return $mockHttpClient;
     }
