@@ -1,5 +1,10 @@
 # RestApiExtension for Behat
 
+> [!IMPORTANT]
+> The functionality of this package is now available in [Behat Steps](https://github.com/drevops/behat-steps).
+>
+> **This repository will be decommissioned on 31 December 2026.**
+
 ## About this fork
 
 [![tests](https://github.com/AlexSkrypnyk/rest-api-behat-extension/actions/workflows/test-php.yml/badge.svg)](https://github.com/AlexSkrypnyk/rest-api-behat-extension/actions/workflows/test-php.yml)
@@ -9,9 +14,6 @@
 This is a fork of the original `ubirak/rest-api-behat-extension` package, 
 modified to support modern PHP versions and to introduce Drupal-compatible
 step definitions.
-
-I pledge to maintain this fork and keep it up to date with the latest changes
-from the original repository.
 
 ### Installation
 
